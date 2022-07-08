@@ -3,9 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.uvcpermissiontest">
 
-    <uses-feature android:name="android.hardware.usb.host" />
-    <uses-sdk android:minSdkVersion="12" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="true" />
+
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
         android:allowBackup="true"

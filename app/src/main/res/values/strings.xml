@@ -3,5 +3,5 @@
     <string name="camera_unavailable">Camera unavailable</string>
     <string name="camera_permission_granted">Camera permission granted.</string>
     <string name="camera_permission_denied">Camera permission denied by user.</string>
-    <string name="app_name">DESIRED_APP_NAME</string>
+    <string name="app_name">USB camera preview</string>
 </resources>

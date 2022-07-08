@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String ACTION_USB_PERMISSION = "ACTION_USB_PERMISSION";
     private static final int REQ_PERMISSION_USB = 16;
     private static final int REQ_PERMISSION_CAMERA = 18;
-    private static final String packageName = "com.example.uvcpermissiontest";
+//    private static final String packageName = "com.example.uvcpermissiontest";
 
     private Button btnGet;
 
@@ -153,9 +153,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handlePermissionResult(String permission, Boolean result) {
-        log("handle permission result", "Inside this function");
         if (result) {
-            log("handle permission result", "Inside first if");
 //            if (permission == android.Manifest.permission.CAMERA) {
 //                //TODO : Even if result = true, it is still not coming into this second if statement for some reason. DEBUG THIS. For now I'm removing this loop
 //                log("handle permission result", "Inside second if");
@@ -232,14 +230,19 @@ public class MainActivity extends AppCompatActivity {
         switch(intent.getAction()) {
             case UsbManager.ACTION_USB_DEVICE_ATTACHED :
 				handleActionOnAttachDevice(intent);
+                break;
             case UsbManager.ACTION_USB_DEVICE_DETACHED :
 				handleActionOnDetachDevice(intent);
+                break;
             case ACTION_USB_PERMISSION :
                 handleActionUsbPermission(intent);
+                break;
             case Intent.ACTION_MAIN :
 				scanAttachedDevice();// app launched by user
+                break;
             default :
                 log("Unknown intent", "action=" + intent.getAction());
+                break;
         }
     }
 
@@ -252,11 +255,11 @@ public class MainActivity extends AppCompatActivity {
         boolean hasPermission = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
         if (device != null) {
             hasPermission = hasPermission || manager.hasPermission(device);
-            log("USB_DEVICE_ATTACHED", "hasPermission="+ hasPermission + "\n" + deviceName(device));
+            log("USB_DEVICE_ATTACHED", deviceName(device) + "hasPermission="+ hasPermission + "\n");
             if (!hasPermission) {
                 requestUsbPermission(manager, device);
             } else {
-                log("USB permission", "already has permission:\n    ${deviceName(device)}");
+                log("USB permission", deviceName(device) + "already has permission:\n");
             }
         } else {
             log("USB_DEVICE_ATTACHED", "device is null");
@@ -277,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleActionUsbPermission(Intent intent) {
         UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
         boolean hasPermission = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
-        log("Result", "hasPermission=" + hasPermission + "\n" + deviceName(device));
+        log("Result", deviceName(device) + " has permission=" + hasPermission + "\n");
     }
 
 //--------------------------------------------------------------------------------
@@ -286,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void scanAttachedDevice() {
         if (DEBUG) Log.v(TAG, "scanAttachedDevice:");
-        log("SCAN", "start------------------");
+        log("SCAN", "start");
         UsbManager manager = (UsbManager)getSystemService(Context.USB_SERVICE);
 
         HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
@@ -294,27 +297,29 @@ public class MainActivity extends AppCompatActivity {
         UsbDevice device = null;
         while (deviceIterator.hasNext()) {
             device = deviceIterator.next();
+            log("Device_detected", deviceName(device));
             if (isUVC(device)) {
                 if (!manager.hasPermission(device)) {
                     requestUsbPermission(manager, device);
-//                    break;
+                    break;
                 } else {
                     log("USB permission", "already has permission:\n" + deviceName(device));
                 }
             }
+
         }
-        log("SCAN", "finished------------------");
+        log("SCAN", "finished");
     }
 
     /**
      * request USB permission for specific device
      */
     private void requestUsbPermission(UsbManager manager, UsbDevice device) {
-        log("USB permission", "request\n    ${deviceName(device)}");
+        log("USB permission", "requesting for " + deviceName(device));
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PendingIntent permissionIntent = PendingIntent.getBroadcast(MainActivity.this, REQ_PERMISSION_USB, new Intent(ACTION_USB_PERMISSION).setPackage(packageName), 0);
+                PendingIntent permissionIntent = PendingIntent.getBroadcast(MainActivity.this, REQ_PERMISSION_USB, new Intent(ACTION_USB_PERMISSION), 0);
                 manager.requestPermission(device, permissionIntent);
             }
         });
@@ -371,7 +376,7 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                logTv.append(tag + ":\n" + msg + "\n");
+                logTv.append(tag + " : " + msg + "\n");
                 mLogScrollView.scrollTo(0, logTv.getBottom());
             }
         });
